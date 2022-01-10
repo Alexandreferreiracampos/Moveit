@@ -5,7 +5,7 @@
 }
 
 :root {
-  --whit: #fff;
+  --white: rgb(255, 255, 255);
   --background: #f2f3f5;
   --gray-line: #dcdde0;
   --text: #666666;
@@ -15,6 +15,7 @@
   --blue: #5965e0;
   --blue-dark: #4953b8;
   --blue-twitter: #2aa9e0;
+  --title: rgb(53, 59, 72);
 }
 
 @media (max-width: 1080px) {
@@ -50,13 +51,5 @@ a {
   text-decoration: none;
 }
 
-.container {
-  height: 100vh;
-  max-width: 992px;
-  margin: 0 auto;
-  padding: 2.5rem 2rem;
-  display: flex;
-  flex-direction: column;
-}
 
 
