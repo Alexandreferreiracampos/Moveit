@@ -4,21 +4,26 @@
     font-family: Rajdhani;
     font-weight:600;
     color: var(--title);
+    justify-content: center;
+       align-items: center;
 }
-
-.countdownContainer > div{
-    flex: 1;
+  
+.countdownContainer > div {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     background-color: var(--white);
+    height: 12rem;
+    width: 12rem;
     box-shadow: 0 0 60px rgba(0, 0, 0, 0.05);
-    font-size: 8.5rem;
+    border-radius: 5px;
+    font-size: 8rem;
     text-align: center;
-}
+ }
 
 .countdownContainer > div span{
-    flex: 1
+    flex: 1;
+
 }
 
 .countdownContainer > div span:first-child {
