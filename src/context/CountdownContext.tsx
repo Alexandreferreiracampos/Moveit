@@ -39,7 +39,7 @@ export function CountdownProvider({children}: CountdownProviderProps){
 
     function startCountdown(){
         setActive(true);
-        setHasFinished(false);
+        
 
     }
 
