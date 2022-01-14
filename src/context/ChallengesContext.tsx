@@ -1,8 +1,7 @@
 import {createContext, useState, ReactNode, useEffect} from 'react';
+import {LoadingData} from '../components/LoadingData'
 import challenges from '../../challenges.json';
-import Cookies from 'js-cookie'
-import { LevelUpModal } from '../components/LevelUpModal';
-
+import axios from 'axios';
 
 interface Challenge {
     type: 'body' | 'eye';
@@ -20,50 +19,61 @@ interface ChallengesContextData {
     startNewChallenges: () => void;
     resetChallenges:()=>void;
     completeChallenge:()=>void;
-    closeModal:()=>void;
 }
 
 interface ChallengesProviderProps{
     children: ReactNode;
-     level: number,
-     currentExperiences: number,
-     challengesCompleted: number,
-     
 }
 
 export const challengeContext = createContext({} as ChallengesContextData);
 
-export function ChallengesProvider({children, ...rest}: ChallengesProviderProps ){
+export function ChallengesProvider({children}: ChallengesProviderProps ){
 
-    const [level, setLevel] = useState(rest.level ?? 1);
-    const [currentExperiences, setCurrentExperience] = useState(rest.currentExperiences ?? 0);
-    const [challengesCompleted, setChallengesCompleted] = useState(rest.challengesCompleted ?? 0);
-    const [modalLevelUp, setModalLevelUp] = useState(false);
+   
 
+    const [dados, setDados] = useState([]);
+    const [atualiza, setAtuliza] = useState(true);
+    
+    const [level, setLevel] = useState(0);
+    
+    const [currentExperiences, setCurrentExperience] = useState(0);
+    const [challengesCompleted, setChallengesCompleted] = useState(0);
     const [activeChallenge, setActiveChallenge] = useState(null);
-
+    
     const experienceToNextLevel = Math.pow((level +1)* 4, 2);
+    
+    async function atualizaDB(){
+        const response = await axios.get('http://localhost:3333/moveit').then(({data}) => {
+        
+            setDados(data.moveit)
+            dados.map((d)=>{
+                setAtuliza(false)
+                setLevel(Number(d.level))
+                setCurrentExperience(Number(d.currentExperiences))
+                setChallengesCompleted(Number(d.challengesCompleted))
+                
+            })
+            
+          });
+          
+    }
+    
+    if(atualiza == true){
+        atualizaDB()
+        
+    }
 
+    
+    
+    function leveUp(){
+        setLevel(level + 1);
+    }
+    
     useEffect(()=>{
         Notification.requestPermission();
         
 
     },[])
-
-    useEffect(()=>{
-        Cookies.set('level', String(level));
-        Cookies.set('currentExperiences', String(currentExperiences));
-        Cookies.set('challengesCompleted', String(challengesCompleted));
-    }, [level, currentExperiences, challengesCompleted])
-
-    function leveUp(){
-        setLevel(level + 1);
-        setModalLevelUp(true);
-    }
-
-    function closeModal(){
-        setModalLevelUp(false);
-    }
 
     function startNewChallenges(){
         const randomChallengeIndex = Math.floor(Math.random() * challenges.length);
@@ -86,7 +96,8 @@ export function ChallengesProvider({children, ...rest}: ChallengesProviderProps 
 
     }
 
-    function completeChallenge(){
+    async function completeChallenge(){
+        
         if(!activeChallenge){
             return;
         }
@@ -98,7 +109,6 @@ export function ChallengesProvider({children, ...rest}: ChallengesProviderProps 
 
         let finalExperience = currentExperiences + amount;
 
-
         if(finalExperience > experienceToNextLevel){
             setCurrentExperience(finalExperience - experienceToNextLevel)
             leveUp();
@@ -107,9 +117,22 @@ export function ChallengesProvider({children, ...rest}: ChallengesProviderProps 
             setCurrentExperience(finalExperience)
         )
 
-
     }
+    
+    useEffect(()=>{
+          PUT()
+    },[level, currentExperiences, challengesCompleted])
 
+    function PUT(){
+        axios.put('http://localhost:3333/moveit/Alexandre', {  
+            "nome": "Alexandre",
+            "level": level,
+            "currentExperiences": currentExperiences,
+            "challengesCompleted": challengesCompleted
+      })
+    }
+    
+   
     return(
         <challengeContext.Provider 
         value={{
@@ -118,14 +141,13 @@ export function ChallengesProvider({children, ...rest}: ChallengesProviderProps 
             startNewChallenges,
             resetChallenges,
             completeChallenge,
-            closeModal,
             experienceToNextLevel,
             currentExperiences,
             challengesCompleted,
             activeChallenge,
         }}>
             {children}
-        {modalLevelUp && <LevelUpModal/>}
+        {atualiza && <LoadingData/>}
         </challengeContext.Provider>
     )
 
